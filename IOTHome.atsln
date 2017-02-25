@@ -17,6 +17,8 @@ Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "DHT22", "DHT22\DHT22.cpppro
 EndProject
 Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "PowerControl", "PowerControl\PowerControl.cppproj", "{F219AE96-9426-4062-86A9-5EB87985C51E}"
 EndProject
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "BatteryVoltage", "BatteryVoltage\BatteryVoltage.cppproj", "{2EF58389-023B-42EC-BC17-B3DF5C476F4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -51,6 +53,10 @@ Global
 		{F219AE96-9426-4062-86A9-5EB87985C51E}.Debug|AVR.Build.0 = Debug|AVR
 		{F219AE96-9426-4062-86A9-5EB87985C51E}.Release|AVR.ActiveCfg = Release|AVR
 		{F219AE96-9426-4062-86A9-5EB87985C51E}.Release|AVR.Build.0 = Release|AVR
+		{2EF58389-023B-42EC-BC17-B3DF5C476F4A}.Debug|AVR.ActiveCfg = Debug|AVR
+		{2EF58389-023B-42EC-BC17-B3DF5C476F4A}.Debug|AVR.Build.0 = Debug|AVR
+		{2EF58389-023B-42EC-BC17-B3DF5C476F4A}.Release|AVR.ActiveCfg = Release|AVR
+		{2EF58389-023B-42EC-BC17-B3DF5C476F4A}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

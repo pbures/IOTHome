@@ -39,7 +39,8 @@
  #include <PowerControl.h>
  #include <DHT22.h>
  #include <IOPin.h>
-
+ #include <BatteryVoltage.h>
+ 
  static int uart_putchar(char c, FILE *stream);
  static FILE mystdout = {0};
 
@@ -89,19 +90,21 @@
 	 
 	 RFM69 radio(true, &rf69SpiCsPin, &rf69DIO0Pin);
 	 
+	 BatteryVoltage batteryVoltage;
+	 
 	 #ifdef TRANSCIEVER
 	 bool res = radio.initialize(RF69_868MHZ, RFM_TRANSCIEVER_DEVICE_ID, RFM_NETWORK_ID);
 	 #else
 	 bool res = radio.initialize(RF69_868MHZ, RFM_RECEIVER_DEVICE_ID, RFM_NETWORK_ID);
 	 #endif
 	 wdt_reset();
-	 	 
+	 
 	 if (res) {
 		 printf("...RF69 Initialization successful.\r\n");
 		 } else {
 		 printf("...RF69 Failed.\r\n");
 	 }
-	 	 
+	 
 	 radio.setHighPower();
 	 //radio.encrypt(ENCRYPTKEY);
 	 //radio.enableAutoPower(ATC_RSSI);
@@ -112,37 +115,45 @@
 	 while(true) {
 		 
 		 //for(uint8_t i=0;i<10;i++){
-			//wdt_reset();
-			 //_delay_ms(1000);
+		 //wdt_reset();
+		 //_delay_ms(1000);
 		 //}
 		 
 		 /* Power on the DHT22 sensor and git it 500ms to start (got this time by experimenting) */
 		 pwrPin.setHigh();
 		 _delay_ms(500);
 
-		 wdt_reset();		 
-		 float temperature = myDht.getTemperature();
-		 float humidity = myDht.getHumidity();
+		 float temperature = 0.0f;
+		 float humidity = 0.0f;
+		 
+		 for(uint8_t c=0; c < 3; c++) {
+			 wdt_reset();
+			 temperature = myDht.getTemperature(true);
+			 humidity = myDht.getHumidity();
+			 if (!isnan(temperature) && !isnan(humidity)) break; 
+		 };
 
 		 /* Power off the DHT by disconnecting it */
 		 pwrPin.setLow();
+		 
+		 uint8_t voltage = batteryVoltage.getVoltagePercentage(3300);
 
-		 snprintf(buffer,50,"T[%+07.2f] H[%+07.2f]",(double)temperature, (double)humidity);
+		 snprintf(buffer,50,"T[%+07.2f] H[%+07.2f] B[%i]",(double)temperature, (double)humidity, voltage);
 		 printf("%s", buffer);
 
 		 wdt_reset();
-		 /*Retries set to 1 as we do not have ACK on arduino side */	 
-		 bool sent = radio.sendWithRetry(RFM_RECEIVER_DEVICE_ID, buffer, strlen(buffer)+1, 1); 
+		 /*Retries set to 1 as we do not have ACK on arduino side */
+		 bool sent = radio.sendWithRetry(RFM_RECEIVER_DEVICE_ID, buffer, strlen(buffer)+1, 1);
 		 radio.sleep();
 		 
 		 printf_P(PSTR("...%s\r\n"), sent ? " success" : " failure");
 		 
-		 wdt_reset();	 
+		 wdt_reset();
 		 if (sent) {
 			 grnLed.setHigh();
 			 _delay_ms(100);
 			 grnLed.setLow();
-		 } else {
+			 } else {
 			 redLed.setHigh();
 			 _delay_ms(100);
 			 redLed.setLow();
@@ -156,7 +167,7 @@
 	 radio.promiscuous(false);
 	 
 	 #ifdef DEBUG
-     printf("Checking if radio received signal...\r\n");
+	 printf("Checking if radio received signal...\r\n");
 	 #endif
 	 
 	 while(true){
@@ -177,7 +188,7 @@
 			 }
 			 
 			 printf("\r\n");
-			_delay_ms(500);
+			 _delay_ms(500);
 		 }
 	 }
 	 #endif
