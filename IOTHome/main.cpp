@@ -143,7 +143,7 @@
 
 		 wdt_reset();
 		 /*Retries set to 1 as we do not have ACK on arduino side */
-		 bool sent = radio.sendWithRetry(RFM_RECEIVER_DEVICE_ID, buffer, strlen(buffer)+1, 1);
+		 bool sent = radio.sendWithRetry(RFM_RECEIVER_DEVICE_ID, buffer, strlen(buffer)+1, 3);
 		 radio.sleep();
 		 
 		 printf_P(PSTR("...%s\r\n"), sent ? " success" : " failure");
@@ -159,7 +159,7 @@
 			 redLed.setLow();
 		 }
 		 
-		 PowerControl::sleepNow(10);
+		 PowerControl::sleepNow(60);
 	 }
 	 #endif
 	 
